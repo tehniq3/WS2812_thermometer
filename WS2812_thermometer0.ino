@@ -1,3 +1,4 @@
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Adafruit_NeoPixel.h>
@@ -70,6 +71,15 @@ void loop(void)
   }
 */
 
+
+  if (temp < te0)
+ {
+  r = 0;
+  g = 0;
+  b = 255;
+ }
+
+
  if ((temp >= te0) and (temp < te1))
  {
   r1 = 0;
@@ -135,7 +145,7 @@ void loop(void)
   b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
  }
 
- if ((temp >= te5) and (temp <= te6))
+ if ((temp >= te5) and (temp < te6))
  {
   r1 = 255;
   g1 = 0;
@@ -147,6 +157,14 @@ void loop(void)
   g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
   b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
  }
+
+  if (temp >= te6)
+ {
+  r = 255;
+  g = 0;
+  b = 0;
+ }
+ 
 
    //se aprinde doar numărul de diode, care arata temperatura - 20, așa că, de exemplu, 25 ° ar trebui să aprindă 5 diode
   for(i=0; i<numar_led; i++) {
