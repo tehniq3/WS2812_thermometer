@@ -1,4 +1,3 @@
-
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Adafruit_NeoPixel.h>
@@ -19,6 +18,12 @@ DallasTemperature sensors(&oneWire);
 // Create an instance of the Adafruit_NeoPixel class called "leds". That'll be what we refer to from here on...
 Adafruit_NeoPixel leds = Adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
 
+// photoresistor: +5V---|==LDR=|---A0---|==10k==|---GND
+#define LDR 0
+int lumina = 0;
+float klumina = 0;
+
+// temperaturi
 int te0 = 10;
 int te1 = 15;
 int te2 = 20;
@@ -27,9 +32,9 @@ int te4 = 30;
 int te5 = 35;
 int te6 = 40;
 
-int r, r1, r2;
-int g, g1, g2;
-int b, b1, b2;
+int r;
+int g;
+int b;
  
 void setup(void)
 {
@@ -54,6 +59,9 @@ void loop(void)
 //  ds18b20
   sensors.requestTemperatures(); // Send the command to get temperatures. request to all devices on the bus
   temp = sensors.getTempCByIndex(0);
+
+  if (temp < te0) temp = te0;
+  if (temp > te6) temp = te6;
  
   Serial.print("Temperature: ");
   Serial.println(temp); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
@@ -72,99 +80,53 @@ void loop(void)
 */
 
 
-  if (temp < te0)
+  if ((temp >= te0) and (temp < te1))
+ {
+  r = 255;
+  g = 255;
+  b = 255;
+ }
+
+ if ((temp >= te1) and (temp < te2))
+ {
+  r = 255;
+  g = 255;
+  b = 255;
+ }
+
+ if ((temp >= te2) and (temp < te3))
  {
   r = 0;
   g = 0;
   b = 255;
  }
 
-
- if ((temp >= te0) and (temp < te1))
- {
-  r1 = 0;
-  g1 = 0;
-  b1 = 255;
-  r2 = 255;
-  g2 = 255;
-  b2 = 255;
-  r = (r2-r1)/(te1-te0)*(temp-te0)+r1;
-  g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
-  b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
- }
-
- if ((temp >= te1) and (temp < te2))
- {
-  r1 = 255;
-  g1 = 255;
-  b1 = 255;
-  r2 = 0;
-  g2 = 255;
-  b2 = 255;
-  r = (r2-r1)/(te1-te0)*(temp-te0)+r1;
-  g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
-  b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
- }
-
- if ((temp >= te2) and (temp < te3))
- {
-  r1 = 0;
-  g1 = 255;
-  b1 = 255;
-  r2 = 0;
-  g2 = 255;
-  b2 = 0;
-  r = (r2-r1)/(te1-te0)*(temp-te0)+r1;
-  g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
-  b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
- }
-
  if ((temp >= te3) and (temp < te4))
  {
-  r1 = 0;
-  g1 = 255;
-  b1 = 0;
-  r2 = 255;
-  g2 = 255;
-  b2 = 0;
-  r = (r2-r1)/(te1-te0)*(temp-te0)+r1;
-  g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
-  b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
+  r = 0;
+  g = 255;
+  b = 0;
  }
 
  if ((temp >= te4) and (temp < te5))
  {
-  r1 = 255;
-  g1 = 255;
-  b1 = 0;
-  r2 = 255;
-  g2 = 0;
-  b2 = 0;
-  r = (r2-r1)/(te1-te0)*(temp-te0)+r1;
-  g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
-  b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
+  r = 255;
+  g = 0;
+  b = 0;
  }
 
- if ((temp >= te5) and (temp < te6))
- {
-  r1 = 255;
-  g1 = 0;
-  b1 = 0;
-  r2 = 255;
-  g2 = 0;
-  b2 = 255;
-  r = (r2-r1)/(te1-te0)*(temp-te0)+r1;
-  g = (b2-b1)/(te1-te0)*(temp-te0)+g1;
-  b = (b2-b1)/(te1-te0)*(temp-te0)+b1;
- }
-
-  if (temp >= te6)
+ if ((temp >= te5) and (temp <= te6))
  {
   r = 255;
   g = 0;
-  b = 255;
+  b = 0;
  }
- 
+
+lumina = analogRead(LDR);
+klumina = lumina/1024.;
+r = r*klumina;
+g = g*klumina;
+b = b*klumina;
 
    //se aprinde doar numărul de diode, care arata temperatura - 20, așa că, de exemplu, 25 ° ar trebui să aprindă 5 diode
   for(i=0; i<numar_led; i++) {
